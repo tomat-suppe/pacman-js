@@ -1,15 +1,36 @@
-# pacman-js
+# JS Framework for Observing Game State
+This repository is an extension of the bachelor project of Lukas, Ida and Sophie from the IT University of Copenhagen.
+The repository is used as a playground to integrate our WIP JS framework for observing game state with Brent Ward's Pacman game.
+
+**Current run instructions:**
+To run the framework server-side for receiving data from the game:
+From `/build/server` run:
+```code
+  node Serverapi.js
+```
+
+To run the Pacman game with CORS enabled (this is very important):
+From `/` run:
+```code
+  node node_modules/http-server/bin/http-server --cors
+```
+
+Game can now be accessed at `http://127.0.0.1:8080/`, and logged events can be seen in the terminal from which the Serverapi was run.
+
+# Below follows the original ReadMe from Brent Ward
+
+## pacman-js
 
 [![Code Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://github.com/bward2/pacman-js/blob/master/coverage/coverage-summary.json)
 [![Code Style](https://img.shields.io/badge/code%20style-airbnb-brightgreen.svg)](https://github.com/airbnb/javascript)
 
 Pacman clone made with Javascript, HTML, and CSS.
 
-### _**[Play it!](https://bward2.github.io/pacman-js/)**_
+####_**[Play it!](https://bward2.github.io/pacman-js/)**_
 
 🍒🍓🍊🍎🍈👾🔔🔑
 
-## Development Instructions
+### Development Instructions
 
 This project makes use of _**[NodeJS](https://nodejs.org/en/)**_. Download it, then clone this repo and run the following commands:
 
