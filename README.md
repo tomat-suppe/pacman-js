@@ -26,7 +26,7 @@ Game can now be accessed at `http://127.0.0.1:8080/`, and logged events can be s
 
 Pacman clone made with Javascript, HTML, and CSS.
 
-####_**[Play it!](https://bward2.github.io/pacman-js/)**_
+#### _**[Play it!](https://bward2.github.io/pacman-js/)**_
 
 🍒🍓🍊🍎🍈👾🔔🔑
 
