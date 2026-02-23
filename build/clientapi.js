@@ -7,6 +7,8 @@ EventLog.push({windowWidth: width, windowHeight: height});
 
 console.log("Width: " + EventLog[0].windowWidth + " Height: " + EventLog[0].windowHeight);
 
+
+
 // Listener that triggers on a key-press
 window.addEventListener("keydown", e => {
    const Event = {
@@ -14,11 +16,14 @@ window.addEventListener("keydown", e => {
          location: null,          // Location is null (unimportant). This does not need to be added in JS,
                                   // but has been added for database coherency. Can consider removing.
          eventTime: e.timeStamp,  // MS since browser load
+         points: document.getElementById('points-display').innerText, // Only for key-press events, gets the current points of the user.
+         logicalTimeStamp: document.getElementById('logical-display').textContent, 
    };
+
 
    EventLog.push(Event); // Adding event name, location and time to the EventLog list.
 
-   console.log(`Logged ${Event.eventName} action. Logged at ${Event.eventTime}`); // Only for testing
+   console.log(`Logged ${Event.eventName} action. Logged at ${Event.eventTime} and has ${Event.points} points, on the logical ${Event.logicalTimeStamp} logical timestamp`); // Only for testing
 });
 
 // Listener that triggers on a mouse click (or touch click)
@@ -79,7 +84,7 @@ window.addEventListener("resize", e => {
 });
 
 // Listen for closing of the browser window from the client, so the EventLog can be sent to server
-window.addEventListener("unload", e => {
+window.addEventListener("beforeunload", e => {
    const Event = {
       eventName: "Session Ended",
       location: null,
