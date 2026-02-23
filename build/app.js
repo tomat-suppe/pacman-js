@@ -2356,7 +2356,7 @@ class GameCoordinator {
 
 class GameEngine {
   constructor(maxFps, entityList) {
-    this.fpsDisplay = document.getElementById('fps-display');
+    this.logicalDisplay = document.getElementById('logical-display');
     this.elapsedMs = 0;
     this.lastFrameTimeMs = 0;
     this.entityList = entityList;
@@ -2386,14 +2386,14 @@ class GameEngine {
    * Updates the on-screen FPS counter once per second
    * @param {number} timestamp - The amount of MS which has passed since starting the game engine
    */
-  updateFpsDisplay(timestamp) {
+  updateLogicalDisplay(timestamp) {
     if (timestamp > this.lastFpsUpdate + 1000) {
       this.fps = (this.framesThisSecond + this.fps) / 2;
       this.lastFpsUpdate = timestamp;
       this.framesThisSecond = 0;
     }
     this.framesThisSecond += 1;
-    this.fpsDisplay.textContent = `${Math.round(this.fps)} FPS`;
+    this.logicalDisplay.textContent = `${this.frameId}`;
   }
 
   /**
@@ -2493,7 +2493,7 @@ class GameEngine {
 
     this.elapsedMs += timestamp - this.lastFrameTimeMs;
     this.lastFrameTimeMs = timestamp;
-    this.updateFpsDisplay(timestamp);
+    this.updateLogicalDisplay(timestamp);
     this.processFrames();
     this.draw(this.elapsedMs / this.timestep, this.entityList);
 

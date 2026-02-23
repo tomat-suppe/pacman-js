@@ -7,18 +7,22 @@ EventLog.push({windowWidth: width, windowHeight: height});
 
 console.log("Width: " + EventLog[0].windowWidth + " Height: " + EventLog[0].windowHeight);
 
+
 // Listener that triggers on a key-press
 window.addEventListener("keydown", e => {
    const Event = {
          eventName: e.key,
          location: null,          // Location is null (unimportant). This does not need to be added in JS,
                                   // but has been added for database coherency. Can consider removing.
-         eventTime: e.timeStamp,  // MS since browser load
+         points: document.getElementById('points-display').innerText, // Only for key-press events, gets the current points of the user.
+         logicalTimeStamp: document.getElementById('logical-display').textContent, // Logical timestamp based on frameId
    };
 
    EventLog.push(Event); // Adding event name, location and time to the EventLog list.
 
-   console.log(`Logged ${Event.eventName} action. Logged at ${Event.eventTime}`); // Only for testing
+   console.log(`Logged ${Event.eventName} action. 
+      Logged at ${Event.eventTime} and has ${Event.points} points,
+      on the logical ${Event.logicalTimeStamp} logical timestamp`); // Only for testing
 });
 
 // Listener that triggers on a mouse click (or touch click)
@@ -26,7 +30,8 @@ window.addEventListener("click", e => {
    const Event = {
       eventName: "click",
       location: {x: e.clientX, y: e.clientY}, // Position of mouse at time of click.
-      eventTime: e.timeStamp,
+      points: document.getElementById('points-display').innerText, // Only for key-press events, gets the current points of the user.
+      logicalTimeStamp: document.getElementById('logical-display').textContent, // Logical timestamp based on frameId
    }
 
    EventLog.push(Event); // Adding event name, location and time to the EventLog list.
@@ -43,13 +48,15 @@ window.addEventListener("touchstart", e => {
       const Event = {
          eventName: "touchstart",
          location: {x: e.touches[0].clientX, y: e.touches[0].clientY},     // how to get location tree of a swipe?
-         eventTime: e.timeStamp,
+         points: document.getElementById('points-display').innerText, // Only for key-press events, gets the current points of the user.
+         logicalTimeStamp: document.getElementById('logical-display').textContent, // Logical timestamp based on frameId
       }
 
       const Event2 = {
          eventName: "touchend",
          location: {x: e2.changedTouches[0].clientX, y: e2.changedTouches[0].clientY},     // how to get location tree of a swipe?
-         eventTime: e2.timeStamp,
+         points: document.getElementById('points-display').innerText, // Only for key-press events, gets the current points of the user.
+         logicalTimeStamp: document.getElementById('logical-display').textContent, // Logical timestamp based on frameId
       }
    
       EventLog.push(Event); // Adding event name, location and time to the EventLog list.
@@ -69,7 +76,8 @@ window.addEventListener("resize", e => {
          location: null,          // Location is null (unimportant). This does not need to be added in JS,
                                   // but has been added for database coherency. Can consider removing.
          windowsize: {windowWidth: window.innerWidth, windowHeight: window.innerHeight}, //this only exists in resize events
-         eventTime: e.timeStamp,  // MS since browser load
+         points: document.getElementById('points-display').innerText, // Only for key-press events, gets the current points of the user.
+         logicalTimeStamp: document.getElementById('logical-display').textContent, // Logical timestamp based on frameId
    };
 
    EventLog.push(Event); // Adding event name, location and time to the EventLog list.
@@ -83,7 +91,8 @@ window.addEventListener("beforeunload", e => {
    const Event = {
       eventName: "Session Ended",
       location: null,
-      eventTime: e.timeStamp,  // MS since browser load
+      points: document.getElementById('points-display').innerText, // Only for key-press events, gets the current points of the user.
+      logicalTimeStamp: document.getElementById('logical-display').textContent, // Logical timestamp based on frameId
    }
 
    EventLog.push(Event);
@@ -97,9 +106,7 @@ window.addEventListener("beforeunload", e => {
                   .then(response => console.log(response))
                   .then(data => console.log(data))
                   .catch(error => console.error('Error:', error));
-   EventLog = []; // Clear the EventLog after sending to server              
-
-   console.log("EventLog length: " + EventLog.length); // Only for testing
+   EventLog = []; // Clear the EventLog after sending to server
 });
 
 // Sends the EventLog to the independent server, however right now it only sends at the start of load.
@@ -116,7 +123,5 @@ setInterval(async() => {
                   .catch(error => console.error('Error:', error));
       
       EventLog = [];
-      console.log(`EventLog length is ${EventLog.length}`);    
-       
    }
 }, 5000);
