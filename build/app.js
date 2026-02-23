@@ -2393,7 +2393,6 @@ class GameEngine {
       this.framesThisSecond = 0;
     }
     this.framesThisSecond += 1;
-    console.log(this.frameId + ' : timestamp');
     this.logicalDisplay.textContent = `${this.frameId}`;
   }
 
