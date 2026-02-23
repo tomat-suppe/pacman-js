@@ -4,7 +4,7 @@ import cors from 'cors';
 const app = express();
 const PORT = 3000;
 
-var receivedData = {};
+export var receivedData = {};
 
 app.use(cors());
 
@@ -28,12 +28,11 @@ try {
 //Curl command for test post request: curl -d "key1=value&key2=value2" localhost:3000/log-data
 try {
 app.post('/log-data', (req, res) => {
-   const eventData = req.body;
-   console.log('Received event data:', req.body);
 
-   receivedData = Object.assign(receivedData, eventData);
 
+   receivedData = Object.assign(receivedData, req.body);
    console.log(receivedData);
+
 
    res.json({ status : "ok"});
 });
