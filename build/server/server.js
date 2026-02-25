@@ -5,8 +5,9 @@ import cors from 'cors';
 const app = express();
 const PORT = 3000;
 
+var filePath = './data.json'
 // Create a file for saving the json data of the game session. Should not be in current directory in the future.
-var file = fs.createWriteStream('./data.json', {flags: 'w'});
+var file = fs.createWriteStream(filePath, {flags: 'w'});
 
 // Creating JSON object for the file
 let fileStart = {
@@ -14,10 +15,10 @@ let fileStart = {
 };
 
 // Appending fileStart into the JSON file
-fs.writeFileSync('./data.json', (JSON.stringify(fileStart)));
+fs.writeFileSync(filePath, (JSON.stringify(fileStart)));
 
 // Create a JSON object for appending data when receiving through POST
-const data = fs.readFileSync('./data.json');
+const data = fs.readFileSync(filePath);
 const jsonData = JSON.parse(data);
 
 app.use(cors());
@@ -49,7 +50,7 @@ app.post('/log-data', (req, res) => {
 
    try {
       // Write the new JSON data into the file
-      var written = fs.writeFileSync('./data.json', JSON.stringify(jsonData));
+      var written = fs.writeFileSync(filePath, JSON.stringify(jsonData));
    } catch (e) {
       console.log(`Could not write to file, with error: ${e}`);
    }
