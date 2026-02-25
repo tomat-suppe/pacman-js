@@ -42,8 +42,10 @@ try {
 //Curl command for test post request: curl -d "key1=value&key2=value2" localhost:3000/log-data
 try {
 app.post('/log-data', (req, res) => {
-   // Append received data to the JSON object.
-   jsonData.gamedata.push(req.body);
+   // Append received data to the JSON object by iterating over the received array.
+   req.body.forEach(function(v) { jsonData.gamedata.push(v) });
+
+   //jsonData.gamedata.push(req.body);
 
    try {
       // Write the new JSON data into the file
