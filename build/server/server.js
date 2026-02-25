@@ -5,6 +5,9 @@ import cors from 'cors';
 const app = express();
 const PORT = 3000;
 
+// Boolean to keep track of whether a gamesession has ended.
+var ended = false;
+
 var filePath = './data.json'
 // Create a file for saving the json data of the game session. Should not be in current directory in the future.
 var file = fs.createWriteStream(filePath, {flags: 'w'});
@@ -44,7 +47,9 @@ try {
 try {
 app.post('/log-data', (req, res) => {
    // Append received data to the JSON object by iterating over the received array.
-   req.body.forEach(function(v) { jsonData.gamedata.push(v) });
+   req.body.forEach(function(v) {
+      if (v.eventName === "Session Ended") {ended = true};
+      jsonData.gamedata.push(v) });
 
    //jsonData.gamedata.push(req.body);
 
@@ -55,9 +60,13 @@ app.post('/log-data', (req, res) => {
       console.log(`Could not write to file, with error: ${e}`);
    }
 
+   if (ended) {
+      file.end();
+      console.log("file ended");
+   }
+
    res.json({ status : "ok"});
 });
 } catch (e) {
    console.log("Post error: " + e);
 }
-
