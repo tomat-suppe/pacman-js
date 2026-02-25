@@ -9,7 +9,8 @@ const PORT = 3000;
 var ended = false;
 
 var filePath = './data.json'
-// Create a file for saving the json data of the game session. Should not be in current directory in the future.
+
+// Create a file for saving the json data of the game session.
 var file = fs.createWriteStream(filePath, {flags: 'w'});
 
 // Creating JSON object for the file
@@ -33,7 +34,6 @@ app.listen(PORT, () => {
 app.use(express.json());
 
 
-//Curl command for get request: curl localhost:3000/log-data
 try {
    app.get('/log-data', (req, res) => {
       res.send("nothing to get at log-data")
@@ -43,7 +43,6 @@ try {
    console.log("Could not get. Error: " + e)
 }
 
-//Curl command for test post request: curl -d "key1=value&key2=value2" localhost:3000/log-data
 try {
 app.post('/log-data', (req, res) => {
    // Append received data to the JSON object by iterating over the received array.
@@ -51,11 +50,9 @@ app.post('/log-data', (req, res) => {
       if (v.eventName === "Session Ended") {ended = true};
       jsonData.gamedata.push(v) });
 
-   //jsonData.gamedata.push(req.body);
-
    try {
       // Write the new JSON data into the file
-      var written = fs.writeFileSync(filePath, JSON.stringify(jsonData));
+      fs.writeFileSync(filePath, JSON.stringify(jsonData));
    } catch (e) {
       console.log(`Could not write to file, with error: ${e}`);
    }
