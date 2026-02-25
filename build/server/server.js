@@ -5,16 +5,18 @@ import cors from 'cors';
 const app = express();
 const PORT = 3000;
 
-//export var receivedData = {};
-
+// Create a file for saving the json data of the game session. Should not be in current directory in the future.
 var file = fs.createWriteStream('./data.json', {flags: 'w'});
 
+// Creating JSON object for the file
 let fileStart = {
    "gamedata": []
 };
 
+// Appending fileStart into the JSON file
 fs.writeFileSync('./data.json', (JSON.stringify(fileStart)));
 
+// Create a JSON object for appending data when receiving through POST
 const data = fs.readFileSync('./data.json');
 const jsonData = JSON.parse(data);
 
@@ -40,13 +42,14 @@ try {
 //Curl command for test post request: curl -d "key1=value&key2=value2" localhost:3000/log-data
 try {
 app.post('/log-data', (req, res) => {
-   //receivedData = Object.assign(receivedData, req.body);
-   //console.log(receivedData);
-   jsonData.gamedata.push(JSON.stringify(req.body));
-   var written = fs.writeFileSync('./data.json', JSON.stringify(jsonData));
-   //var written = file.write(JSON.stringify(req.body) + "\n"); //<-- the place to test
-   if (!written){
-      console.log("write error");
+   // Append received data to the JSON object.
+   jsonData.gamedata.push(req.body);
+
+   try {
+      // Write the new JSON data into the file
+      var written = fs.writeFileSync('./data.json', JSON.stringify(jsonData));
+   } catch (e) {
+      console.log(`Could not write to file, with error: ${e}`);
    }
 
    res.json({ status : "ok"});
