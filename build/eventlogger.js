@@ -1,5 +1,4 @@
-
-export class EventLogger {
+export default class EventLogger {
    constructor() {
       var EventLog = []; // Array for holding tuples of eventName and eventTime, to send to server
 
@@ -20,9 +19,5 @@ export class EventLogger {
 
       EventLog.push(Event); 
       console.log(`Logged ${Event.eventName} action. Logged at ${Event.eventTime} and has ${Event.points} points`); // Only for testing
-
-
    }
-
-
 }

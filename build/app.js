@@ -1,5 +1,8 @@
 import EventLogger from './eventlogger.js';
 
+let gameCoordinator;
+
+
 class Ghost {
   constructor(scaledTileSize, mazeArray, pacman, name, level, characterUtil, blinky) {
     this.scaledTileSize = scaledTileSize;
@@ -1210,14 +1213,12 @@ class GameCoordinator {
       this.mainMenu.style.visibility = 'hidden';
     }, 1000);
 
-
-    this.EventLogger.logEvent('gameStart', this.gameEngine.frameId, this.points);
-
     this.reset();
     if (this.firstGame) {
       this.firstGame = false;
       this.init();
     }
+
     this.startGameplay(true);
   }
 
@@ -3231,3 +3232,6 @@ class Timer {
   }
 }
 
+window.addEventListener("load", () => {
+  gameCoordinator = new GameCoordinator()
+});
