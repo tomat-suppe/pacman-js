@@ -1,4 +1,4 @@
-import EventLogger from './eventlogger.js';
+import { EventLogger } from './eventlogger.js';
 
 let gameCoordinator;
 
@@ -1569,7 +1569,7 @@ class GameCoordinator {
    * Calls necessary setup functions to start the game
    */
   init() {
-    this.EventLogger = new EventLogger();
+    this.EventLogger = new EventLogger([]);
     this.registerEventListeners();
     this.registerTouchListeners();
 
@@ -1840,6 +1840,7 @@ class GameCoordinator {
     } else if (this.movementKeys[e.keyCode]) {
       this.changeDirection(this.movementKeys[e.keyCode]);
     }
+    this.EventLogger.logEvent(e.key, this.gameEngine.frameId, this.points);
   }
 
   /**
