@@ -12,7 +12,7 @@
     </script>
 
     <link href='build/app.css' rel='stylesheet'>
-    <script src='build/app.js'></script>
+    <script type='module' src='build/app.js'></script>
     <link rel='shortcut icon' type='image/x-icon' href='favicon.ico'>
     <link href='https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap' rel='stylesheet'>
     <link href='https://fonts.googleapis.com/icon?family=Material+Icons'
@@ -26,7 +26,7 @@
 
   <body>
     <div id='overflow-mask' class='overflow-mask'>
-      <div id='logical-display' class='logical-display'></div>
+      <div id='fps-display' class='fps-display'></div>
       <div id='preload-div' class='preload-div'></div>
 
       <div id='main-menu-container' class='main-menu-container'>
@@ -127,13 +127,6 @@
           by playing on an unsupported browser.
         </div>
       </div>
-
-      <script>
-        window.onload = () => {
-          let gameCoordinator = new GameCoordinator();
-        }
-      </script>
     </div>
-    <script src='build/eventlogger.js'></script>
   </body>
 </html>

@@ -1,3 +1,8 @@
+import { EventLogger } from './eventlogger.js';
+
+let gameCoordinator;
+
+
 class Ghost {
   constructor(scaledTileSize, mazeArray, pacman, name, level, characterUtil, blinky) {
     this.scaledTileSize = scaledTileSize;
@@ -1213,6 +1218,8 @@ class GameCoordinator {
       this.firstGame = false;
       this.init();
     }
+    this.EventLogger.logKeyDownEvent("Game started", "startbutton", this.gameEngine.frameId, this.points);
+    
     this.startGameplay(true);
   }
 
@@ -1563,6 +1570,7 @@ class GameCoordinator {
    * Calls necessary setup functions to start the game
    */
   init() {
+    this.EventLogger = new EventLogger([], 50);
     this.registerEventListeners();
     this.registerTouchListeners();
 
@@ -1766,8 +1774,12 @@ class GameCoordinator {
     window.addEventListener('addTimer', this.addTimer.bind(this));
     window.addEventListener('removeTimer', this.removeTimer.bind(this));
     window.addEventListener('releaseGhost', this.releaseGhost.bind(this));
+    window.addEventListener('beforeunload', this.handleGameEnded.bind(this));
   }
 
+  handleGameEnded (event) {
+    this.EventLogger.logGameEnd("Game ended by player", this.gameEngine.frameId, this.points, this.highScore)
+  }
   /**
    * Register listeners for touchstart and touchend to handle mobile device swipes
    */
@@ -1833,6 +1845,7 @@ class GameCoordinator {
     } else if (this.movementKeys[e.keyCode]) {
       this.changeDirection(this.movementKeys[e.keyCode]);
     }
+    this.EventLogger.logKeyDownEvent(e.key, this.gameEngine.frameId, this.points);
   }
 
   /**
@@ -1840,6 +1853,8 @@ class GameCoordinator {
    * @param {Event} e - The direction of the swipe
    */
   handleSwipe(e) {
+    this.EventLogger.logClickEvent(e.detail, this.gameEngine.frameId, this.points);
+
     const { direction } = e.detail;
     this.changeDirection(direction);
   }
@@ -1975,6 +1990,7 @@ class GameCoordinator {
    * Displays GAME OVER text and displays the menu so players can play again
    */
   gameOver() {
+    this.EventLogger.logGameOver("Game Over", this.gameEngine.frameId, this.points, this.highScore);
     localStorage.setItem('highScore', this.highScore);
 
     new Timer(() => {
@@ -2109,6 +2125,7 @@ class GameCoordinator {
                   new Timer(() => {
                     this.mazeCover.style.visibility = 'hidden';
                     this.level += 1;
+                    this.EventLogger.logNewLevel(this.level, this.gameEngine.frameId, this.points);
                     this.allowKeyPresses = true;
                     this.entityList.forEach((entity) => {
                       const entityRef = entity;
@@ -2356,7 +2373,7 @@ class GameCoordinator {
 
 class GameEngine {
   constructor(maxFps, entityList) {
-    this.logicalDisplay = document.getElementById('logical-display');
+    this.fpsDisplay = document.getElementById('fps-display');
     this.elapsedMs = 0;
     this.lastFrameTimeMs = 0;
     this.entityList = entityList;
@@ -2386,14 +2403,14 @@ class GameEngine {
    * Updates the on-screen FPS counter once per second
    * @param {number} timestamp - The amount of MS which has passed since starting the game engine
    */
-  updateLogicalDisplay(timestamp) {
+  updateFpsDisplay(timestamp) {
     if (timestamp > this.lastFpsUpdate + 1000) {
       this.fps = (this.framesThisSecond + this.fps) / 2;
       this.lastFpsUpdate = timestamp;
       this.framesThisSecond = 0;
     }
     this.framesThisSecond += 1;
-    this.logicalDisplay.textContent = `${this.frameId}`;
+    this.fpsDisplay.textContent = `${Math.round(this.fps)} FPS`;
   }
 
   /**
@@ -2493,7 +2510,7 @@ class GameEngine {
 
     this.elapsedMs += timestamp - this.lastFrameTimeMs;
     this.lastFrameTimeMs = timestamp;
-    this.updateLogicalDisplay(timestamp);
+    this.updateFpsDisplay(timestamp);
     this.processFrames();
     this.draw(this.elapsedMs / this.timestep, this.entityList);
 
@@ -3225,3 +3242,6 @@ class Timer {
   }
 }
 
+window.addEventListener("load", () => {
+  gameCoordinator = new GameCoordinator()
+});

@@ -1,127 +1,139 @@
-var EventLog = []; // Array for holding tuples of eventName and eventTime, to send to server
+export class EventLogger {
+   constructor(eventlog, flushSize) {
+      this.EventLog = eventlog; // Array for holding tuples of eventName and eventTime, to send to server
+      this.flushSize = flushSize; // Number of events to log before sending to server
+      const width = window.innerWidth;
+      const height = window.innerHeight;
 
-const width = window.innerWidth;
-const height = window.innerHeight;
-
-EventLog.push({windowWidth: width, windowHeight: height});
-
-console.log("Width: " + EventLog[0].windowWidth + " Height: " + EventLog[0].windowHeight);
-
-
-// Listener that triggers on a key-press
-window.addEventListener("keydown", e => {
-   const Event = {
-         eventName: e.key,
-         location: null,          // Location is null (unimportant). This does not need to be added in JS,
-                                  // but has been added for database coherency. Can consider removing.
-         points: document.getElementById('points-display').innerText, // Only for key-press events, gets the current points of the user.
-         logicalTimeStamp: document.getElementById('logical-display').textContent, // Logical timestamp based on frameId
-   };
-
-   EventLog.push(Event); // Adding event name, location and time to the EventLog list.
-
-   console.log(`Logged ${Event.eventName} action. 
-      Logged at ${Event.eventTime} and has ${Event.points} points,
-      on the logical ${Event.logicalTimeStamp} logical timestamp`); // Only for testing
-});
-
-// Listener that triggers on a mouse click (or touch click)
-window.addEventListener("click", e => {
-   const Event = {
-      eventName: "click",
-      location: {x: e.clientX, y: e.clientY}, // Position of mouse at time of click.
-      points: document.getElementById('points-display').innerText, // Only for key-press events, gets the current points of the user.
-      logicalTimeStamp: document.getElementById('logical-display').textContent, // Logical timestamp based on frameId
+      this.EventLog.push({windowWidth: width, windowHeight: height});  
    }
 
-   EventLog.push(Event); // Adding event name, location and time to the EventLog list.
-   
-   console.log(`Logged ${Event.eventName} action. Logged at ${Event.eventTime}`); // Only for testing
-});
 
-/**
-   Listener that triggers on a touch swipe, logs the start and end of swipes.
-   BUG: Sometimes logs several times for one swipe.
-**/
-window.addEventListener("touchstart", e => {
-   window.addEventListener("touchend", e2 => {
+   /**
+    * Called by user of the library. Logs events locally. 
+    **/
+   logKeyDownEvent(event, time, points) {
       const Event = {
-         eventName: "touchstart",
-         location: {x: e.touches[0].clientX, y: e.touches[0].clientY},     // how to get location tree of a swipe?
-         points: document.getElementById('points-display').innerText, // Only for key-press events, gets the current points of the user.
-         logicalTimeStamp: document.getElementById('logical-display').textContent, // Logical timestamp based on frameId
-      }
+            eventName: event,
+            eventTime: time,
+            points: points,
+      };
 
-      const Event2 = {
-         eventName: "touchend",
-         location: {x: e2.changedTouches[0].clientX, y: e2.changedTouches[0].clientY},     // how to get location tree of a swipe?
-         points: document.getElementById('points-display').innerText, // Only for key-press events, gets the current points of the user.
-         logicalTimeStamp: document.getElementById('logical-display').textContent, // Logical timestamp based on frameId
-      }
-   
-      EventLog.push(Event); // Adding event name, location and time to the EventLog list.
-      EventLog.push(Event2);
-
-      console.log(`Logged ${Event.eventName} action.
-         Logged at ${Event.eventTime} time, at ${Event.location.x} and ${Event.location.y}`);     // Only for testing
-      console.log(`Logged ${Event2.eventName} action.
-         Logged at ${Event2.eventTime} time, at ${Event2.location.x} and ${Event2.location.y}`);  // Only for testing
-   });
-});
-
-// Listener that triggers on a resize
-window.addEventListener("resize", e => {
-   const Event = {
-         eventName: "resize",
-         location: null,          // Location is null (unimportant). This does not need to be added in JS,
-                                  // but has been added for database coherency. Can consider removing.
-         windowsize: {windowWidth: window.innerWidth, windowHeight: window.innerHeight}, //this only exists in resize events
-         points: document.getElementById('points-display').innerText, // Only for key-press events, gets the current points of the user.
-         logicalTimeStamp: document.getElementById('logical-display').textContent, // Logical timestamp based on frameId
-   };
-
-   EventLog.push(Event); // Adding event name, location and time to the EventLog list.
-
-   console.log(`Logged ${Event.eventName} action. Logged at ${Event.eventTime}.
-      Screen size: width: ${Event.windowsize.windowWidth}, height: ${Event.windowsize.windowHeight}`); // Only for testing
-});
-
-// Listen for closing of the browser window from the client, so the EventLog can be sent to server
-window.addEventListener("beforeunload", e => {
-   const Event = {
-      eventName: "Session Ended",
-      location: null,
-      points: document.getElementById('points-display').innerText, // Only for key-press events, gets the current points of the user.
-      logicalTimeStamp: document.getElementById('logical-display').textContent, // Logical timestamp based on frameId
-   }
-
-   EventLog.push(Event);
-
-   fetch('http://localhost:3000/log-data',
-               {  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  mode: 'cors',
-                  cache: 'default',
-                  body: JSON.stringify(EventLog)})
-                  .then(response => console.log(response))
-                  .then(data => console.log(data))
-                  .catch(error => console.error('Error:', error));
-   EventLog = []; // Clear the EventLog after sending to server
-});
-
-// Sends the EventLog to the independent server, however right now it only sends at the start of load.
-setInterval(async() => {
-   if (EventLog.length > 10) {
-      await fetch('http://localhost:3000/log-data',
-               {  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  mode: 'cors',
-                  cache: 'default',
-                  body: JSON.stringify(EventLog)})
-                  .then(response => console.log(response))
-                  .then(data => console.log(data))
-                  .catch(error => console.error('Error:', error));
+      this.EventLog.push(Event); 
+      console.log(`Logged ${Event.eventName} action. Logged at ${Event.eventTime} and has ${Event.points} points`); // Only for testing
       
-      EventLog = [];
+      // Array is flushed and data sent, every time the array hits over 10 elements.
+      // Interval can be changed later
+      if (this.EventLog.length > this.flushSize) {
+         this.postData();
+      }
    }
-}, 5000);
+
+
+   /**
+    * Used to log clicks on buttons, and clicks and their placement.
+    * Location when logging a button click is the button name.
+    * When logging a specific place click, recommended syntax for
+    * location is: {x: xcoord, y: ycoord}.
+    * Can also be used to log swipe events by logging the direction
+    * as the event(Name) and the location as the location of the initiated
+    * swipe (if nescessary).
+    **/
+   logClickEvent(event, location, time, points) {
+      const Event = {
+            eventName: event,
+            location: location,
+            eventTime: time,
+            points: points,
+      };
+
+      this.EventLog.push(Event); 
+      console.log(`Logged ${JSON.stringify(Event.eventName)} action, clicked at ${Event.location}. Logged at ${Event.eventTime} and has ${Event.points} points`); // Only for testing
+      
+      // Array is flushed and data sent, every time the array hits over 10 elements.
+      // Interval can be changed later
+      if (this.EventLog.length > this.flushSize) {
+         this.postData();
+      }
+   }
+
+
+   /**
+    * Log new level.
+    **/
+   logNewLevel(newlevel, time, points) {
+      const Event = {
+            level: newlevel,
+            eventTime: time,
+            points: points,
+      };
+
+      this.EventLog.push(Event); 
+      console.log(`Level changed to ${Event.level}. Logged at ${Event.eventTime} time and has ${Event.points} points`); // Only for testing
+      
+      // Array is flushed and data sent, every time the array hits over 10 elements.
+      // Interval can be changed later
+      if (this.EventLog.length > this.flushSize) {
+         this.postData();
+      }
+   }
+
+
+   /**
+    * Log game over. Eventname can be e.g. "Game Over"
+    **/
+   logGameOver(event, time, points, highscore) {
+      const Event = {
+            eventName: event,
+            eventTime: time,
+            points: points,
+            highscore: highscore,
+      };
+
+      this.EventLog.push(Event); 
+      console.log(`Logged ${Event.eventName}. Logged at ${Event.eventTime} and has ${Event.points} points, with ${Event.highscore} highscore`); // Only for testing
+      
+      // Array is flushed and data sent, every time the array hits over 10 elements.
+      // Interval can be changed later
+      if (this.EventLog.length > this.flushSize) {
+         this.postData();
+      }
+   }
+
+
+
+   /**
+    * Log game end, e.g. call event for "Game ended by user".
+    **/
+   logGameEnd(event, time, points, highscore) {
+      const Event = {
+            eventName: event,
+            eventTime: time,
+            points: points,
+            highscore: highscore,
+      };
+
+      this.EventLog.push(Event); 
+      console.log(`Logged ${Event.eventName}. Logged at ${Event.eventTime} and has ${Event.points} points, with ${Event.highscore} highscore`); // Only for testing
+      
+      // Array is flushed as player has ended the game.
+      this.postData();
+   }
+
+
+   /**
+    * Send logged events to the server via. POST request. 
+    **/
+   postData () {
+      fetch('http://localhost:3000/log-data',
+               {  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  mode: 'cors',
+                  cache: 'default',
+                  body: JSON.stringify(this.EventLog)})
+                  .then(response => console.log(response))
+                  .catch(error => console.error('Error:', error));
+         
+      this.EventLog = [];
+   }
+}
