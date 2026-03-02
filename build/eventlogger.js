@@ -1,6 +1,7 @@
 export class EventLogger {
-   constructor(eventlog) {
+   constructor(eventlog, flushSize) {
       this.EventLog = eventlog; // Array for holding tuples of eventName and eventTime, to send to server
+      this.flushSize = flushSize; // Number of events to log before sending to server
       const width = window.innerWidth;
       const height = window.innerHeight;
 
@@ -23,7 +24,7 @@ export class EventLogger {
       
       // Array is flushed and data sent, every time the array hits over 10 elements.
       // Interval can be changed later
-      if (this.EventLog.length > 10) {
+      if (this.EventLog.length > this.flushSize) {
          this.postData();
       }
    }
@@ -51,7 +52,7 @@ export class EventLogger {
       
       // Array is flushed and data sent, every time the array hits over 10 elements.
       // Interval can be changed later
-      if (this.EventLog.length > 10) {
+      if (this.EventLog.length > this.flushSize) {
          this.postData();
       }
    }
@@ -72,7 +73,7 @@ export class EventLogger {
       
       // Array is flushed and data sent, every time the array hits over 10 elements.
       // Interval can be changed later
-      if (this.EventLog.length > 10) {
+      if (this.EventLog.length > this.flushSize) {
          this.postData();
       }
    }
@@ -94,10 +95,11 @@ export class EventLogger {
       
       // Array is flushed and data sent, every time the array hits over 10 elements.
       // Interval can be changed later
-      if (this.EventLog.length > 10) {
+      if (this.EventLog.length > this.flushSize) {
          this.postData();
       }
    }
+
 
 
    /**

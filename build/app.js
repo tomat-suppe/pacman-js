@@ -1570,7 +1570,7 @@ class GameCoordinator {
    * Calls necessary setup functions to start the game
    */
   init() {
-    this.EventLogger = new EventLogger([]);
+    this.EventLogger = new EventLogger([], 50);
     this.registerEventListeners();
     this.registerTouchListeners();
 
