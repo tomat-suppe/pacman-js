@@ -1114,7 +1114,7 @@ class GameCoordinator {
       ['XXXXXXXXXXXXXXXXXXXXXXXXXXXX'],
     ];
 
-    this.maxFps = 120;
+    this.maxFps = 100;
     this.tileSize = 8;
     this.scale = this.determineScale(1);
     this.scaledTileSize = this.tileSize * this.scale;
@@ -1217,7 +1217,7 @@ class GameCoordinator {
       this.firstGame = false;
       this.init();
     }
-    this.EventLogger.logClickEvent("Game started", "startbutton", this.gameEngine.frameId, this.points);
+    this.EventLogger.logClickEvent("Click", "game-start", this.gameEngine.frameId, this.points);
     
     this.startGameplay(true);
   }
@@ -1852,7 +1852,7 @@ class GameCoordinator {
    * @param {Event} e - The direction of the swipe
    */
   handleSwipe(e) {
-    this.EventLogger.logClickEvent(e.detail, this.gameEngine.frameId, this.points);
+    this.EventLogger.logClickEvent("Swipe", e.detail, this.gameEngine.frameId, this.points);
 
     const { direction } = e.detail;
     this.changeDirection(direction);
@@ -1989,7 +1989,7 @@ class GameCoordinator {
    * Displays GAME OVER text and displays the menu so players can play again
    */
   gameOver() {
-    this.EventLogger.logGameOver("Game Over", this.gameEngine.frameId, this.points, this.highScore);
+    this.EventLogger.logGameOver("Game over", this.gameEngine.frameId, this.points, this.highScore);
     localStorage.setItem('highScore', this.highScore);
 
     new Timer(() => {
@@ -2124,7 +2124,7 @@ class GameCoordinator {
                   new Timer(() => {
                     this.mazeCover.style.visibility = 'hidden';
                     this.level += 1;
-                    this.EventLogger.logNewLevel(this.level, this.gameEngine.frameId, this.points);
+                    this.EventLogger.logNewLevel("Level changed", this.level, this.gameEngine.frameId, this.points);
                     this.allowKeyPresses = true;
                     this.entityList.forEach((entity) => {
                       const entityRef = entity;

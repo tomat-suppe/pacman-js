@@ -60,8 +60,9 @@ export class EventLogger {
    /**
     * Log new level.
     **/
-   logNewLevel(newlevel, time, points) {
+   logNewLevel(eventName, newlevel, time, points) {
       const Event = {
+            eventName: eventName,
             level: newlevel,
             eventTime: time,
             points: points,
