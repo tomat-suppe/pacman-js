@@ -2,7 +2,6 @@ import { EventLogger } from './eventlogger.js';
 
 let gameCoordinator;
 
-
 class Ghost {
   constructor(scaledTileSize, mazeArray, pacman, name, level, characterUtil, blinky) {
     this.scaledTileSize = scaledTileSize;
@@ -1218,7 +1217,7 @@ class GameCoordinator {
       this.firstGame = false;
       this.init();
     }
-    this.EventLogger.logKeyDownEvent("Game started", "startbutton", this.gameEngine.frameId, this.points);
+    this.EventLogger.logClickEvent("Game started", "startbutton", this.gameEngine.frameId, this.points);
     
     this.startGameplay(true);
   }
@@ -2524,6 +2523,7 @@ class GameEngine {
    * @param {number} timestamp - The amount of MS which has passed since starting the game engine
    */
   mainLoop(timestamp) {
+    //console.log(this.maxFps);
     this.engineCycle(timestamp);
   }
 }

@@ -13,7 +13,7 @@
     "posttest": "node scripts/coverage-summary.js",
     "lint": "eslint .",
     "update": "ncu -i --format group",
-    "serve": "node ./node_modules/http-server/bin/http-server --cors",
+    "serve": "node ./node_modules/http-server/bin/http-server --cors --allow-file-access",
     "watch": "gulp watch",
     "prepare": "husky"
   },
