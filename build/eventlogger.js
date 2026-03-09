@@ -3,10 +3,11 @@ export class EventLogger {
       this.EventLog = eventlog; // Array for holding tuples of eventName and eventTime, to send to server
       const width = window.innerWidth;
       const height = window.innerHeight;
+      
+      this.start = Date.now();  
 
       this.EventLog.push({windowWidth: width, windowHeight: height});  
    }
-
 
    /**
     * Called by user of the library. Logs events locally. 
@@ -14,7 +15,7 @@ export class EventLogger {
    logKeyDownEvent(event, time, points) {
       const Event = {
             eventName: event,
-            eventTime: time,
+            eventTime: time - this.start,
             points: points,
       };
 
@@ -42,10 +43,9 @@ export class EventLogger {
       const Event = {
             eventName: event,
             location: location,
-            eventTime: time,
+            eventTime: time - this.start,
             points: points,
       };
-
       this.EventLog.push(Event); 
       console.log(`Logged ${JSON.stringify(Event.eventName)} action, clicked at ${Event.location}. Logged at ${Event.eventTime} and has ${Event.points} points`); // Only for testing
       

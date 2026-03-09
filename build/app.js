@@ -1114,7 +1114,7 @@ class GameCoordinator {
       ['XXXXXXXXXXXXXXXXXXXXXXXXXXXX'],
     ];
 
-    this.maxFps = 100;
+    this.maxFps = 120;
     this.tileSize = 8;
     this.scale = this.determineScale(1);
     this.scaledTileSize = this.tileSize * this.scale;
@@ -1217,7 +1217,7 @@ class GameCoordinator {
       this.firstGame = false;
       this.init();
     }
-    this.EventLogger.logClickEvent("Click", "game-start", this.gameEngine.frameId, this.points);
+    this.EventLogger.logClickEvent("Click", "game-start", Date.now(), this.points);
     
     this.startGameplay(true);
   }
@@ -1844,7 +1844,7 @@ class GameCoordinator {
     } else if (this.movementKeys[e.keyCode]) {
       this.changeDirection(this.movementKeys[e.keyCode]);
     }
-    this.EventLogger.logKeyDownEvent(e.key, this.gameEngine.frameId, this.points);
+    this.EventLogger.logKeyDownEvent(e.key, Date.now(), this.points);
   }
 
   /**
@@ -2460,8 +2460,11 @@ class GameEngine {
         this.lastFrameTimeMs = firstTimestamp;
         this.lastFpsUpdate = firstTimestamp;
         this.framesThisSecond = 0;
-
+        this.startingTime = Date.now();
+        this.delay = 0;
+        //console.log(`Game started at ${this.startingTime}`);
         this.frameId = requestAnimationFrame((timestamp) => {
+          //console.log(this.frameId , ": frameID");
           this.mainLoop(timestamp);
         });
       });
@@ -2502,6 +2505,7 @@ class GameEngine {
   engineCycle(timestamp) {
     if (timestamp < this.lastFrameTimeMs + (1000 / this.maxFps)) {
       this.frameId = requestAnimationFrame((nextTimestamp) => {
+        //console.log(this.frameId , ": frameID");
         this.mainLoop(nextTimestamp);
       });
       return;
@@ -2512,6 +2516,9 @@ class GameEngine {
     this.updateFpsDisplay(timestamp);
     this.processFrames();
     this.draw(this.elapsedMs / this.timestep, this.entityList);
+    //console.log("delay is : ", Date.now() - this.startingTime - this.delay);
+    //this.delay = Date.now() - this.startingTime;
+    //console.log(`Frame time: ${this.delay} ms`);
 
     this.frameId = requestAnimationFrame((nextTimestamp) => {
       this.mainLoop(nextTimestamp);
