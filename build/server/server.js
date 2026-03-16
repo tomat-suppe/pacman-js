@@ -5,25 +5,8 @@ import cors from 'cors';
 const app = express();
 const PORT = 3000;
 
-// Boolean to keep track of whether a gamesession has ended.
-var ended = false;
-
-var filePath = './data.json'
-
-// Create a file for saving the json data of the game session.
-var file = fs.createWriteStream(filePath, {flags: 'w'});
-
-// Creating JSON object for the file
-let fileStart = {
-   "gamedata": []
-};
-
-// Appending fileStart into the JSON file
-fs.writeFileSync(filePath, (JSON.stringify(fileStart)));
-
-// Create a JSON object for appending data when receiving through POST
-const data = fs.readFileSync(filePath);
-const jsonData = JSON.parse(data);
+// Key for identifying events in output JSON file
+let key = 0;
 
 app.use(cors());
 
@@ -33,37 +16,46 @@ app.listen(PORT, () => {
 
 app.use(express.json());
 
-
+/* Receive post data. */
 try {
-   app.get('/log-data', (req, res) => {
-      res.send("nothing to get at log-data")
+   app.post('/log-data', (req, res) => {
+      // Iterate over every event from the received array 
+      req.body.forEach(function(v) {
+         // Create string filepath associated with the event.
+         var filePath = "./" + v.ID + ".json";
+         
+         // If file does not exist, create it with the start bracket for containing objects
+         if (!fs.existsSync(filePath)) {
+            fs.writeFileSync(filePath, "{", { flag: 'w' });
+         }
 
-   })
-} catch (e) {
-   console.log("Could not get. Error: " + e)
-}
+         // If event ends a session, write the final data and '}' to the file and close it.
+         if (v.eventName === "Session ended") {
+            try {
+               // Formatting: "key" : {eventinformation} }
+               let data = "\"" + key + "\":" + JSON.stringify(v) + "}";
+               key++;
 
-try {
-app.post('/log-data', (req, res) => {
-   // Append received data to the JSON object by iterating over the received array.
-   req.body.forEach(function(v) {
-      if (v.eventName === "Session Ended") {ended = true};
-      jsonData.gamedata.push(v) });
+               fs.writeFileSync(filePath, data, {flag: "a+"});
+            } catch (e) {
+               console.log(`Could not write to file, with error: ${e}`);
+            }
+         }
+         else {
+            try {
+               // Formatting: "key" : {eventdata}
+               let data = "\"" + key + "\":" + JSON.stringify(v) + ",";
+               key++;
 
-   try {
-      // Write the new JSON data into the file
-      fs.writeFileSync(filePath, JSON.stringify(jsonData));
-   } catch (e) {
-      console.log(`Could not write to file, with error: ${e}`);
-   }
-
-   if (ended) {
-      file.end();
-      console.log("file ended");
-   }
-
-   res.json({ status : "ok"});
-});
+               fs.writeFileSync(filePath, data, {flag: "a+"});
+            } catch (e) {
+               console.log(`Could not write to file, with error: ${e}`);
+            }
+         }   
+      });
+      
+      res.json({ status : "ok"});
+   });
 } catch (e) {
    console.log("Post error: " + e);
 }
