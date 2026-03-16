@@ -4,6 +4,8 @@ import cors from 'cors';
 
 const app = express();
 const PORT = 3000;
+
+// Key for identifying events in output JSON file
 let key = 0;
 
 app.use(cors());
@@ -17,32 +19,31 @@ app.use(express.json());
 /* Receive post data. */
 try {
    app.post('/log-data', (req, res) => {
-
       // Iterate over every event from the received array 
       req.body.forEach(function(v) {
          // Create string filepath associated with the event.
          var filePath = "./" + v.ID + ".json";
-
-         // If the file for the session exists, write to it. Else create the file.
+         
+         // If file does not exist, create it with the start bracket for containing objects
          if (!fs.existsSync(filePath)) {
+            fs.writeFileSync(filePath, "{", { flag: 'w' });
+         }
+
+         // If event ends a session, write the final data and '}' to the file and close it.
+         if (v.eventName === "Session ended") {
             try {
-               var file = fs.createWriteStream(filePath, {flags: 'w'});
-               file.write("{", err => (console.log("is this the null problem? could not write " + err)));
+               // Formatting: "key" : {eventinformation} }
+               let data = "\"" + key + "\":" + JSON.stringify(v) + "}";
+               key++;
+
+               fs.writeFileSync(filePath, data, {flag: "a+"});
             } catch (e) {
-               console.log("Could not create file with error: " + e);
+               console.log(`Could not write to file, with error: ${e}`);
             }
          }
-            // If event ends a session, write the final } to the file and close it.
-         if (v.eventName === "Session ended") {
-            // "key" : {eventinformation} }
-            let data = "\"" + key + "\":" + JSON.stringify(v) + "}";
-            key++;
-
-            fs.writeFileSync(filePath, data, {flag: "a+"});
-         } else {
-
+         else {
             try {
-               // String for the new file data of form: "key" : {eventdata}
+               // Formatting: "key" : {eventdata}
                let data = "\"" + key + "\":" + JSON.stringify(v) + ",";
                key++;
 

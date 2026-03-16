@@ -1780,7 +1780,7 @@ class GameCoordinator {
   }
 
   handleGameEnded (event) {
-    this.EventLogger.logGameEnd(ID, "Game ended by player", this.gameEngine.frameId, this.points, this.highScore)
+    this.EventLogger.logGameEnd(ID, "Session ended", this.gameEngine.frameId, this.points, this.highScore)
   }
   /**
    * Register listeners for touchstart and touchend to handle mobile device swipes
