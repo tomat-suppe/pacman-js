@@ -3,6 +3,8 @@ import { EventLogger } from './eventlogger.js';
 let gameCoordinator;
 
 
+var ID = 0;
+
 class Ghost {
   constructor(scaledTileSize, mazeArray, pacman, name, level, characterUtil, blinky) {
     this.scaledTileSize = scaledTileSize;
@@ -1218,7 +1220,7 @@ class GameCoordinator {
       this.firstGame = false;
       this.init();
     }
-    this.EventLogger.logKeyDownEvent("Game started", "startbutton", this.gameEngine.frameId, this.points);
+    this.EventLogger.logKeyDownEvent(ID, "Game started", "startbutton", this.gameEngine.frameId, this.points);
     
     this.startGameplay(true);
   }
@@ -1570,7 +1572,7 @@ class GameCoordinator {
    * Calls necessary setup functions to start the game
    */
   init() {
-    this.EventLogger = new EventLogger([], 50);
+    this.EventLogger = new EventLogger([], 10);
     this.registerEventListeners();
     this.registerTouchListeners();
 
@@ -1778,7 +1780,7 @@ class GameCoordinator {
   }
 
   handleGameEnded (event) {
-    this.EventLogger.logGameEnd("Game ended by player", this.gameEngine.frameId, this.points, this.highScore)
+    this.EventLogger.logGameEnd(ID, "Game ended by player", this.gameEngine.frameId, this.points, this.highScore)
   }
   /**
    * Register listeners for touchstart and touchend to handle mobile device swipes
@@ -1845,7 +1847,7 @@ class GameCoordinator {
     } else if (this.movementKeys[e.keyCode]) {
       this.changeDirection(this.movementKeys[e.keyCode]);
     }
-    this.EventLogger.logKeyDownEvent(e.key, this.gameEngine.frameId, this.points);
+    this.EventLogger.logKeyDownEvent(ID, e.key, this.gameEngine.frameId, this.points);
   }
 
   /**
@@ -1853,7 +1855,7 @@ class GameCoordinator {
    * @param {Event} e - The direction of the swipe
    */
   handleSwipe(e) {
-    this.EventLogger.logClickEvent(e.detail, this.gameEngine.frameId, this.points);
+    this.EventLogger.logClickEvent(ID, e.detail, this.gameEngine.frameId, this.points);
 
     const { direction } = e.detail;
     this.changeDirection(direction);
@@ -1990,7 +1992,7 @@ class GameCoordinator {
    * Displays GAME OVER text and displays the menu so players can play again
    */
   gameOver() {
-    this.EventLogger.logGameOver("Game Over", this.gameEngine.frameId, this.points, this.highScore);
+    this.EventLogger.logGameOver(ID, "Game Over", this.gameEngine.frameId, this.points, this.highScore);
     localStorage.setItem('highScore', this.highScore);
 
     new Timer(() => {
@@ -2125,7 +2127,7 @@ class GameCoordinator {
                   new Timer(() => {
                     this.mazeCover.style.visibility = 'hidden';
                     this.level += 1;
-                    this.EventLogger.logNewLevel(this.level, this.gameEngine.frameId, this.points);
+                    this.EventLogger.logNewLevel(ID, this.level, this.gameEngine.frameId, this.points);
                     this.allowKeyPresses = true;
                     this.entityList.forEach((entity) => {
                       const entityRef = entity;

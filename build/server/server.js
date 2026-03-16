@@ -8,22 +8,21 @@ const PORT = 3000;
 // Boolean to keep track of whether a gamesession has ended.
 var ended = false;
 
-var filePath = './data.json'
+//var filePath = './data.json'
 
 // Create a file for saving the json data of the game session.
-var file = fs.createWriteStream(filePath, {flags: 'w'});
+//var file = fs.createWriteStream(filePath, {flags: 'w'});
+
 
 // Creating JSON object for the file
-let fileStart = {
-   "gamedata": []
-};
+
+
+
 
 // Appending fileStart into the JSON file
-fs.writeFileSync(filePath, (JSON.stringify(fileStart)));
+
 
 // Create a JSON object for appending data when receiving through POST
-const data = fs.readFileSync(filePath);
-const jsonData = JSON.parse(data);
 
 app.use(cors());
 
@@ -46,22 +45,40 @@ try {
 try {
 app.post('/log-data', (req, res) => {
    // Append received data to the JSON object by iterating over the received array.
+
+
    req.body.forEach(function(v) {
-      if (v.eventName === "Session Ended") {ended = true};
-      jsonData.gamedata.push(v) });
 
-   try {
-      // Write the new JSON data into the file
-      fs.writeFileSync(filePath, JSON.stringify(jsonData));
-   } catch (e) {
-      console.log(`Could not write to file, with error: ${e}`);
-   }
+      var filePath = v.ID + ".json";
 
-   if (ended) {
-      file.end();
-      console.log("file ended");
-   }
+      if (fs.existsSync(filePath)) {
 
+         
+         const data = fs.readFileSync(filePath);
+         const jsonData = JSON.parse(data);
+
+         jsonData.ID.push(v);
+         try {
+            // Write the new JSON data into the file
+            fs.writeFileSync(filePath, JSON.stringify(jsonData));
+         } catch (e) {
+            console.log(`Could not write to file, with error: ${e}`);
+         }
+
+
+      }
+      else {
+         
+         fs.createWriteStream(filePath, {flags : 'w'});
+                  
+         let fileStart = {
+            ID : []
+         };
+
+
+         fs.writeFileSync(filePath, (JSON.stringify(fileStart)));
+      }
+   });
    res.json({ status : "ok"});
 });
 } catch (e) {

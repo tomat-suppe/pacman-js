@@ -2,18 +2,15 @@ export class EventLogger {
    constructor(eventlog, flushSize) {
       this.EventLog = eventlog; // Array for holding tuples of eventName and eventTime, to send to server
       this.flushSize = flushSize; // Number of events to log before sending to server
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-
-      this.EventLog.push({windowWidth: width, windowHeight: height});  
    }
 
 
    /**
     * Called by user of the library. Logs events locally. 
     **/
-   logKeyDownEvent(event, time, points) {
+   logKeyDownEvent(ID, event, time, points) {
       const Event = {
+            ID: ID,
             eventName: event,
             eventTime: time,
             points: points,
@@ -39,8 +36,9 @@ export class EventLogger {
     * as the event(Name) and the location as the location of the initiated
     * swipe (if nescessary).
     **/
-   logClickEvent(event, location, time, points) {
+   logClickEvent(ID, event, location, time, points) {
       const Event = {
+            ID: ID,
             eventName: event,
             location: location,
             eventTime: time,
@@ -61,8 +59,9 @@ export class EventLogger {
    /**
     * Log new level.
     **/
-   logNewLevel(newlevel, time, points) {
+   logNewLevel(ID, newlevel, time, points) {
       const Event = {
+            ID: ID,
             level: newlevel,
             eventTime: time,
             points: points,
@@ -82,8 +81,9 @@ export class EventLogger {
    /**
     * Log game over. Eventname can be e.g. "Game Over"
     **/
-   logGameOver(event, time, points, highscore) {
+   logGameOver(ID, event, time, points, highscore) {
       const Event = {
+            ID: ID,
             eventName: event,
             eventTime: time,
             points: points,
@@ -105,8 +105,9 @@ export class EventLogger {
    /**
     * Log game end, e.g. call event for "Game ended by user".
     **/
-   logGameEnd(event, time, points, highscore) {
+   logGameEnd(ID, event, time, points, highscore) {
       const Event = {
+            ID: ID,
             eventName: event,
             eventTime: time,
             points: points,
