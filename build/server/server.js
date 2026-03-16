@@ -4,25 +4,7 @@ import cors from 'cors';
 
 const app = express();
 const PORT = 3000;
-
-// Boolean to keep track of whether a gamesession has ended.
-var ended = false;
-
-//var filePath = './data.json'
-
-// Create a file for saving the json data of the game session.
-//var file = fs.createWriteStream(filePath, {flags: 'w'});
-
-
-// Creating JSON object for the file
-
-
-
-
-// Appending fileStart into the JSON file
-
-
-// Create a JSON object for appending data when receiving through POST
+let key = 0;
 
 app.use(cors());
 
@@ -32,55 +14,47 @@ app.listen(PORT, () => {
 
 app.use(express.json());
 
-
+/* Receive post data. */
 try {
-   app.get('/log-data', (req, res) => {
-      res.send("nothing to get at log-data")
+   app.post('/log-data', (req, res) => {
 
-   })
-} catch (e) {
-   console.log("Could not get. Error: " + e)
-}
+      // Iterate over every event from the received array 
+      req.body.forEach(function(v) {
+         // Create string filepath associated with the event.
+         var filePath = "./" + v.ID + ".json";
 
-try {
-app.post('/log-data', (req, res) => {
-   // Append received data to the JSON object by iterating over the received array.
-
-
-   req.body.forEach(function(v) {
-
-      var filePath = v.ID + ".json";
-
-      if (fs.existsSync(filePath)) {
-
-         
-         const data = fs.readFileSync(filePath);
-         const jsonData = JSON.parse(data);
-
-         jsonData.ID.push(v);
-         try {
-            // Write the new JSON data into the file
-            fs.writeFileSync(filePath, JSON.stringify(jsonData));
-         } catch (e) {
-            console.log(`Could not write to file, with error: ${e}`);
+         // If the file for the session exists, write to it. Else create the file.
+         if (!fs.existsSync(filePath)) {
+            try {
+               var file = fs.createWriteStream(filePath, {flags: 'w'});
+               file.write("{", err => (console.log("is this the null problem? could not write " + err)));
+            } catch (e) {
+               console.log("Could not create file with error: " + e);
+            }
          }
+            // If event ends a session, write the final } to the file and close it.
+         if (v.eventName === "Session ended") {
+            // "key" : {eventinformation} }
+            let data = "\"" + key + "\":" + JSON.stringify(v) + "}";
+            key++;
 
+            fs.writeFileSync(filePath, data, {flag: "a+"});
+         } else {
 
-      }
-      else {
-         
-         fs.createWriteStream(filePath, {flags : 'w'});
-                  
-         let fileStart = {
-            ID : []
-         };
+            try {
+               // String for the new file data of form: "key" : {eventdata}
+               let data = "\"" + key + "\":" + JSON.stringify(v) + ",";
+               key++;
 
-
-         fs.writeFileSync(filePath, (JSON.stringify(fileStart)));
-      }
+               fs.writeFileSync(filePath, data, {flag: "a+"});
+            } catch (e) {
+               console.log(`Could not write to file, with error: ${e}`);
+            }
+         }   
+      });
+      
+      res.json({ status : "ok"});
    });
-   res.json({ status : "ok"});
-});
 } catch (e) {
    console.log("Post error: " + e);
 }
